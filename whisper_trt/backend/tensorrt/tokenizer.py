@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import Dict, List, Optional, Tuple
 
 from ... import BASE_PATH
+import tiktoken
 
 
 _TASKS = (
@@ -114,10 +115,11 @@ LANGUAGES = {
 }
 
 class Tokenizer:
-    def __init__(self, tokenizer, multilingual):
+    def __init__(self, tokenizer, multilingual = True):
         
         self.tokenizer = tokenizer
         self.multilingual = multilingual
+        self.encoding: tiktoken.Encoding
         
         if self.multilingual:
             self.task_to_token_id = {task: self.tokenizer.token_to_id(f"<|{task}|>") for task in _TASKS}
@@ -125,6 +127,13 @@ class Tokenizer:
         else:
             self.task_to_token_id = None
             self.lang_code_to_token_id = None
+            
+        self.special_tokens: Dict[str, int] = {}
+
+    def __post_init__(self):
+        for special in self.encoding.special_tokens_set:
+            special_token = self.encoding.encode_single_token(special)
+            self.special_tokens[special] = special_token
 
     @cached_property
     def transcribe(self) -> int:

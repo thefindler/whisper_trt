@@ -107,7 +107,7 @@ class WhisperModelTRT(WhisperModel):
         
         # Load tokenizer
         tokenizer_file = os.path.join(self.model_path, "tokenizer.json")
-        tokenizer = Tokenizer(tokenizers.Tokenizer.from_file(tokenizer_file), self.model.is_multilingual)
+        tokenizer = Tokenizer(tokenizers.Tokenizer.from_file(tokenizer_file))
 
         # Load model
         self.model = WhisperTRT(self.model_path, tokenizer)
@@ -237,14 +237,9 @@ class WhisperModelTRT(WhisperModel):
                                      prompts,
                                      **self.generate_kwargs)
         
-        print(result)
-        print(seq_lens)
-        print(prompts)
-        print(seg_metadata)
-        
         texts = self.tokenizer.decode_batch([x[0] for x in result])
 
-        print(texts)
+        return texts
         
         response = []
         for idx, r in enumerate(result):

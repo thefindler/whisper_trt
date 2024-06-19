@@ -258,7 +258,7 @@ class ResidualAttentionBlock(nn.Module):
         n_mlp = n_state * 4
         self.mlp = nn.Sequential(
             Linear(n_state, n_mlp), nn.GELU(), Linear(n_mlp, n_state)
-        )
+        ).to("cuda")
         self.mlp_ln = LayerNorm(n_state)
 
     def forward(
@@ -281,7 +281,7 @@ class TextDecoder(nn.Module):
     ):
         super().__init__()
 
-        self.token_embedding = nn.Embedding(n_vocab, n_state)
+        self.token_embedding = nn.Embedding(n_vocab, n_state).to("cuda")
         self.positional_embedding = nn.Parameter(torch.empty(n_ctx, n_state))
 
         self.blocks: Iterable[ResidualAttentionBlock] = nn.ModuleList(
@@ -289,11 +289,12 @@ class TextDecoder(nn.Module):
                 ResidualAttentionBlock(n_state, n_head, cross_attention=True)
                 for _ in range(n_layer)
             ]
-        )
+        ).to("cuda")
         self.ln = LayerNorm(n_state)
 
         mask = torch.empty(n_ctx, n_ctx).fill_(-np.inf).triu_(1)
         self.register_buffer("mask", mask, persistent=False)
+        self.device = None
 
     def forward(self, x: Tensor, xa: Tensor, kv_cache: Optional[dict] = None):
         """
@@ -302,20 +303,27 @@ class TextDecoder(nn.Module):
         xa : torch.Tensor, shape = (batch_size, n_audio_ctx, n_audio_state)
             the encoded audio features to be attended on
         """
+        self.device = xa.device
+        print(x.device, xa.device, 1)
         offset = next(iter(kv_cache.values())).shape[1] if kv_cache else 0
         x = (
             self.token_embedding(x)
             + self.positional_embedding[offset : offset + x.shape[-1]]
         )
+        print(x.device, xa.device, 2)
         x = x.to(xa.dtype)
+        print(x.device, xa.device, 2)
 
         for block in self.blocks:
             x = block(x, xa, mask=self.mask, kv_cache=kv_cache)
 
+        print(x.device, xa.device, 3)
         x = self.ln(x)
+        print(x.device, xa.device, 4)
         logits = (
             x @ torch.transpose(self.token_embedding.weight.to(x.dtype), 0, 1)
         ).float()
+        print(x.device, xa.device, 5)
 
         return logits
 
@@ -394,7 +402,6 @@ class WhisperTRT:
     def generate(self, features, prompts, **generate_kwargs):
         if features.shape[1] == self.n_mels:
             features = self.encode(features)
-        print(features)
         print(self.detect_language(features))
         decoder_input_ids = torch.tensor(prompts)
             
