@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from .... import CACHE_DIR
 
-SAVE_DIR = "./models/trt"
+SAVE_DIR = f"{CACHE_DIR}/models/trt"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 _MODELS = {

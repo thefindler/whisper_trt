@@ -1,16 +1,13 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
-
 with open("requirements.txt", "r", encoding="utf-8") as f:
     requirements = f.read().splitlines()
 
 setup(
     name="whisper_trt",
-    version="1",
-    description="An Optimized Speech-to-Text Pipeline for the Whisper Model.",
-    long_description=long_description,
+    version="0.1",
+    description="TRT implementation of Whisper Model.",
+    long_description="An Optimized Speech-to-Text Pipeline for the Whisper Model.",
     long_description_content_type="text/markdown",
     python_requires=">=3.8",
     license="MIT",
