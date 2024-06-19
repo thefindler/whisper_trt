@@ -115,9 +115,9 @@ class SpeechSegmenter:
         return start_ends
              
     
-    def __call__(self, input_file=None, audio_signal=None):
+    def __call__(self, audio_data=None, audio_signal=None):
         if audio_signal is None:
-            audio_signal, audio_duration = load_audio(input_file, sr=self.sampling_rate, return_duration=True)
+            audio_signal, audio_duration = load_audio(audio_data, sr=self.sampling_rate, return_duration=True)
         else:
             audio_duration = len(audio_signal)/self.sampling_rate
             

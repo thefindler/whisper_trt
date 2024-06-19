@@ -104,12 +104,13 @@ class WhisperModelTRT(WhisperModel):
             print(f"'beam_size' cannot be larger than 'self.trt_build_args.max_beam_width'. Setting 'beam_size' to {self.trt_build_args.max_beam_width}.")
             self.asr_options["beam_size"] = self.trt_build_args.max_beam_width
         
-        # Load model
-        self.model = WhisperTRT(self.model_path)
         
         # Load tokenizer
         tokenizer_file = os.path.join(self.model_path, "tokenizer.json")
         tokenizer = Tokenizer(tokenizers.Tokenizer.from_file(tokenizer_file), self.model.is_multilingual)
+
+        # Load model
+        self.model = WhisperTRT(self.model_path, tokenizer)
 
         if self.asr_options['word_timestamps']:
             self.aligner_model_path = download_model(self.asr_options['word_aligner_model'])
@@ -237,6 +238,9 @@ class WhisperModelTRT(WhisperModel):
                                      **self.generate_kwargs)
         
         print(result)
+        print(seq_lens)
+        print(prompts)
+        print(seg_metadata)
         
         texts = self.tokenizer.decode_batch([x[0] for x in result])
 

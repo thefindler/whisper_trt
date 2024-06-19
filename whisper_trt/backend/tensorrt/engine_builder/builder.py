@@ -17,7 +17,7 @@
 
 import os
 import time
-import argparse
+import argparse, json
 
 import torch
 import tensorrt_llm
@@ -47,6 +47,15 @@ def serialize_engine(engine, path):
 def build_encoder(model, args):
     
     model_metadata = model['dims']
+    # Assuming model_metadata is a dictionary
+    model_metadata_json = json.dumps(model_metadata)
+
+    # Save the JSON to the specified file path
+    model_metadata_output_path = os.path.join(args.output_dir, 'model_metadata.json')
+    with open(model_metadata_output_path, 'w') as f:
+        f.write(model_metadata_json)
+
+
     model_params = model['model_state_dict']
 
     # cast params according dtype

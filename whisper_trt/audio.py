@@ -38,24 +38,27 @@ with tempfile.TemporaryDirectory() as tmpdir:
             print(f"Using 'swr' resampler. This may degrade performance.")
         
 
-def load_audio(input_file, sr=16000, return_duration=False):
+def load_audio(audio_data, sr=16000, return_duration=False):
     
-    try:
-        with wave.open(input_file, 'rb') as wf:
-            if (wf.getframerate() != sr) or (wf.getnchannels() != 1):
-                raise Exception("Not a 16kHz wav mono channel file!")
-                
-            frames = wf.getnframes()
-            x = wf.readframes(int(frames))
-    except:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            wav_file = f"{tmpdir}/tmp.wav"
-            ret_code = os.system(f'ffmpeg -hide_banner -loglevel panic -i "{input_file}" -threads 1 -acodec pcm_s16le -ac 1 -af aresample=resampler={RESAMPLING_ENGINE} -ar {sr} "{wav_file}" -y')
-            if ret_code != 0: raise RuntimeError("ffmpeg failed to resample the input audio file, make sure ffmpeg is compiled properly!")
-        
-            with wave.open(wav_file, 'rb') as wf:
+    if isinstance(audio_data, bytes):
+        x = audio_data
+    else:
+        try:
+            with wave.open(audio_data, 'rb') as wf:
+                if (wf.getframerate() != sr) or (wf.getnchannels() != 1):
+                    raise Exception("Not a 16kHz wav mono channel file!")
+                    
                 frames = wf.getnframes()
                 x = wf.readframes(int(frames))
+        except:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                wav_file = f"{tmpdir}/tmp.wav"
+                ret_code = os.system(f'ffmpeg -hide_banner -loglevel panic -i "{audio_data}" -threads 1 -acodec pcm_s16le -ac 1 -af aresample=resampler={RESAMPLING_ENGINE} -ar {sr} "{wav_file}" -y')
+                if ret_code != 0: raise RuntimeError("ffmpeg failed to resample the input audio file, make sure ffmpeg is compiled properly!")
+            
+                with wave.open(wav_file, 'rb') as wf:
+                    frames = wf.getnframes()
+                    x = wf.readframes(int(frames))
     
     audio_signal = np.frombuffer(x, np.int16).flatten().astype(np.float32)/32768.0
     audio_duration = len(audio_signal)/sr
