@@ -1,9 +1,9 @@
-import os
+import os, json
+import tokenizers
 from functools import cached_property
 from typing import Dict, List, Optional, Tuple
 
 from ... import BASE_PATH
-import tiktoken
 
 
 _TASKS = (
@@ -114,12 +114,19 @@ LANGUAGES = {
     "yue": "cantonese",
 }
 
+# Load the raw JSON to access the added_tokens array
+with open("path/to/your/tokenizer.json", "r") as f:
+    tokenizer_data = json.load(f)
+
+# Extract the added_tokens array
+added_tokens_array = tokenizer_data.get("added_tokens", [])
+
 class Tokenizer:
-    def __init__(self, tokenizer, multilingual = True):
+    def __init__(self, tokenizer_file_path, multilingual = True):
         
-        self.tokenizer = tokenizer
+        self.tokenizer = tokenizers.Tokenizer.from_file(tokenizer_file_path)
         self.multilingual = multilingual
-        self.encoding: tiktoken.Encoding
+        self.num_languages = 99
         
         if self.multilingual:
             self.task_to_token_id = {task: self.tokenizer.token_to_id(f"<|{task}|>") for task in _TASKS}
@@ -127,13 +134,6 @@ class Tokenizer:
         else:
             self.task_to_token_id = None
             self.lang_code_to_token_id = None
-            
-        self.special_tokens: Dict[str, int] = {}
-
-    def __post_init__(self):
-        for special in self.encoding.special_tokens_set:
-            special_token = self.encoding.encode_single_token(special)
-            self.special_tokens[special] = special_token
 
     @cached_property
     def transcribe(self) -> int:
@@ -174,9 +174,9 @@ class Tokenizer:
     @cached_property
     def all_language_tokens(self) -> Tuple[int]:
         result = []
-        for token, token_id in self.special_tokens.items():
-            if token.strip("<|>") in LANGUAGES:
-                result.append(token_id)
+        for added_token in added_tokens_array:
+            if added_token["special"] and added_token["content"].strip("<|>") in LANGUAGES:
+                result.append(added_token["id"])
         return tuple(result)[: self.num_languages]
 
     @cached_property

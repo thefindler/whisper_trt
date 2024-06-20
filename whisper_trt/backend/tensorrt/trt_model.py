@@ -282,7 +282,7 @@ class TextDecoder(nn.Module):
         super().__init__()
 
         self.token_embedding = nn.Embedding(n_vocab, n_state).to("cuda")
-        self.positional_embedding = nn.Parameter(torch.empty(n_ctx, n_state))
+        self.positional_embedding = nn.Parameter(torch.empty(n_ctx, n_state)).to("cuda")
 
         self.blocks: Iterable[ResidualAttentionBlock] = nn.ModuleList(
             [
@@ -290,9 +290,9 @@ class TextDecoder(nn.Module):
                 for _ in range(n_layer)
             ]
         ).to("cuda")
-        self.ln = LayerNorm(n_state)
+        self.ln = LayerNorm(n_state).to("cuda")
 
-        mask = torch.empty(n_ctx, n_ctx).fill_(-np.inf).triu_(1)
+        mask = torch.empty(n_ctx, n_ctx).fill_(-np.inf).triu_(1).to("cuda")
         self.register_buffer("mask", mask, persistent=False)
         self.device = None
 

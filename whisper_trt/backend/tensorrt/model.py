@@ -1,5 +1,4 @@
 import os
-import tokenizers
 import ctranslate2
 import numpy as np
 
@@ -106,8 +105,8 @@ class WhisperModelTRT(WhisperModel):
         
         
         # Load tokenizer
-        tokenizer_file = os.path.join(self.model_path, "tokenizer.json")
-        tokenizer = Tokenizer(tokenizers.Tokenizer.from_file(tokenizer_file))
+        tokenizer_file_path = os.path.join(self.model_path, "tokenizer.json")
+        tokenizer = Tokenizer(tokenizer_file_path)
 
         # Load model
         self.model = WhisperTRT(self.model_path, tokenizer)
