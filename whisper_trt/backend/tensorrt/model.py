@@ -3,7 +3,7 @@ import ctranslate2
 import numpy as np
 
 from .trt_model import WhisperTRT
-from .tokenizer import Tokenizer
+from .tokenizer import get_tokenizer
 from .hf_utils import download_model
 from .engine_builder import build_trt_engine, TRTBuilderConfig, load_trt_build_config
 
@@ -106,7 +106,7 @@ class WhisperModelTRT(WhisperModel):
         
         # Load tokenizer
         tokenizer_file_path = os.path.join(self.model_path, "tokenizer.json")
-        tokenizer = Tokenizer(tokenizer_file_path)
+        tokenizer = get_tokenizer()
 
         # Load model
         self.model = WhisperTRT(self.model_path, tokenizer)
@@ -238,7 +238,7 @@ class WhisperModelTRT(WhisperModel):
         
         texts = self.tokenizer.decode_batch([x[0] for x in result])
 
-        return texts
+        # return texts
         
         response = []
         for idx, r in enumerate(result):

@@ -8,6 +8,7 @@ tokenizers
 huggingface-hub
 accelerate
 optimum
+tiktoken
 transformers
 openai-whisper
 nvidia-ml-py
