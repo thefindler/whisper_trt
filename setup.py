@@ -4,7 +4,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
     requirements = f.read().splitlines()
 
 setup(
-    name="whisper_trt",
+    name="whisper_trt_test",
     version="0.1",
     description="TRT implementation of Whisper Model.",
     long_description="An Optimized Speech-to-Text Pipeline for the Whisper Model.",
