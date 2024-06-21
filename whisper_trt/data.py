@@ -117,6 +117,7 @@ class WhisperDataset(torch.utils.data.Dataset):
         
         if self.without_timestamps:
             prompt = prompt + [self.tokenizer.no_timestamps]
+        print(prompt)
             
         return audio, prompt, initial_prompt_tokens, seq_len
 

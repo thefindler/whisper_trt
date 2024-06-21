@@ -135,28 +135,25 @@ TASKS = (
 @dataclass
 class Tokenizer:
     """A thin wrapper around `tiktoken` providing quick access to special tokens"""
-    def __init__(self):
-        self.encoding: tiktoken.Encoding
-        self.num_languages: int = 99
-        self.language: Optional[str] = None
-        self.task: Optional[str] = None
-        self.special_tokens: Dict[str, int] = field(default_factory=dict)
+    def __init__(self, encoding, num_languages, language, task):
+        self.encoding: tiktoken.Encoding = encoding
+        self.num_languages: int = num_languages
+        self.language: Optional[str] = language
+        self.task: Optional[str] = "translate"
+        self.special_tokens: Dict[str, int] = {}
+        self.start()
 
-    def __post_init__(self):
+    def start(self):
         for special in self.encoding.special_tokens_set:
             special_token = self.encoding.encode_single_token(special)
             self.special_tokens[special] = special_token
-    
-        self.task_to_token_id = {
-            task: self.special_tokens(f"<|{task}|>") for task in TASKS
-        }
 
     def sot_sequence(self, task=None, lang=None):
-        sequence = [self.sot]
+        print(lang, task, "ff")
+        sequence = [self.special_tokens["<|startoftranscript|>"]]
 
-        if self.multilingual:
-            sequence.append(self.to_language_token(lang))
-            sequence.append(self.task_to_token_id[task])
+        sequence.append(self.to_language_token(lang))
+        sequence.append(self.special_tokens[f"<|{task}|>"])
 
         return sequence
 
@@ -184,10 +181,6 @@ class Tokenizer:
     @cached_property
     def eot(self) -> int:
         return self.encoding.eot_token
-
-    @cached_property
-    def sot(self) -> int:
-        return self.special_tokens["<|startoftranscript|>"]
 
     @cached_property
     def transcribe(self) -> int:
@@ -408,7 +401,7 @@ def get_tokenizer(
     if multilingual:
         encoding_name = "multilingual"
         language = language or "en"
-        task = task or "transcribe"
+        task = task or "translate"
     else:
         encoding_name = "gpt2"
         language = None
