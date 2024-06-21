@@ -6,6 +6,7 @@ from ..configs import *
 from ..data import WhisperDataLoader
 from ..audio import LogMelSpectogram
 from ..speech_segmenter import SpeechSegmenter
+from .tensorrt.tokenizer import get_tokenizer
 
 
 class NoneTokenizer:
@@ -70,7 +71,7 @@ class WhisperModel(ABC):
 
         # Tokenizer
         if tokenizer is None:
-            tokenizer = NoneTokenizer()
+            tokenizer = get_tokenizer()
 
         self.tokenizer = tokenizer
 

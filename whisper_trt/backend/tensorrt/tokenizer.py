@@ -127,36 +127,38 @@ TO_LANGUAGE_CODE = {
     "mandarin": "zh",
 }
 
+TASKS = (
+    "transcribe",
+    "translate",
+)
 
 @dataclass
 class Tokenizer:
     """A thin wrapper around `tiktoken` providing quick access to special tokens"""
-
-    encoding: tiktoken.Encoding
-    num_languages: int
-    language: Optional[str] = None
-    task: Optional[str] = None
-    sot_sequence: Tuple[int] = ()
-    special_tokens: Dict[str, int] = field(default_factory=dict)
+    def __init__(self):
+        self.encoding: tiktoken.Encoding
+        self.num_languages: int = 99
+        self.language: Optional[str] = None
+        self.task: Optional[str] = None
+        self.special_tokens: Dict[str, int] = field(default_factory=dict)
 
     def __post_init__(self):
         for special in self.encoding.special_tokens_set:
             special_token = self.encoding.encode_single_token(special)
             self.special_tokens[special] = special_token
+    
+        self.task_to_token_id = {
+            task: self.special_tokens(f"<|{task}|>") for task in TASKS
+        }
 
-        sot: int = self.special_tokens["<|startoftranscript|>"]
-        translate: int = self.special_tokens["<|translate|>"]
-        transcribe: int = self.special_tokens["<|transcribe|>"]
+    def sot_sequence(self, task=None, lang=None):
+        sequence = [self.sot]
 
-        langs = tuple(LANGUAGES.keys())[: self.num_languages]
-        sot_sequence = [sot]
-        if self.language is not None:
-            sot_sequence.append(sot + 1 + langs.index(self.language))
-        if self.task is not None:
-            task_token: int = transcribe if self.task == "transcribe" else translate
-            sot_sequence.append(task_token)
+        if self.multilingual:
+            sequence.append(self.to_language_token(lang))
+            sequence.append(self.task_to_token_id[task])
 
-        self.sot_sequence = tuple(sot_sequence)
+        return sequence
 
     def encode(self, text, **kwargs):
         return self.encoding.encode(text, **kwargs)
@@ -170,7 +172,7 @@ class Tokenizer:
         for tk in tokens:
             res.append([token for token in tk if token < self.eot])
 
-        return self.tokenizer.decode_batch(res)
+        return self.encoding.decode_batch(res)
 
     def decode_with_timestamps(self, token_ids: List[int], **kwargs) -> str:
         """
@@ -182,6 +184,10 @@ class Tokenizer:
     @cached_property
     def eot(self) -> int:
         return self.encoding.eot_token
+
+    @cached_property
+    def sot(self) -> int:
+        return self.special_tokens["<|startoftranscript|>"]
 
     @cached_property
     def transcribe(self) -> int:
