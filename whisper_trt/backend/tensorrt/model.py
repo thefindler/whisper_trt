@@ -237,8 +237,9 @@ class WhisperModelTRT(WhisperModel):
                                      **self.generate_kwargs)
         
         texts = self.tokenizer.decode_batch([x[0] for x in result])
+        print(texts)
 
-        return texts
+        # return texts
         
         response = []
         for idx, r in enumerate(result):
