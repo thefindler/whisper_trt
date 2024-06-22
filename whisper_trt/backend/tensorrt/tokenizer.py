@@ -167,7 +167,7 @@ class Tokenizer:
     def decode_batch(self, tokens):
         res = []
         for tk in tokens:
-            res.append([token for token in tk if token < self.eot])
+            res.append([self.decode(token) for token in tk if token < self.timestamp_begin])
 
         return self.encoding.decode_batch(res)
 
