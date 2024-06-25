@@ -4,7 +4,7 @@ from platformdirs import user_cache_dir
 from .utils import write_outputs
 
 BASE_PATH = os.path.dirname(__file__)
-
+ASSETS_PATH = os.path.join(BASE_PATH, "assets")
 CACHE_DIR = os.path.join(BASE_PATH, "model")
 os.makedirs(CACHE_DIR, exist_ok=True)
 

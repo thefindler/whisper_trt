@@ -3,7 +3,7 @@ import ctranslate2
 import numpy as np
 
 from .trt_model import WhisperTRT
-from .tokenizer import get_tokenizer
+from .tokenizer import Tokenizer
 from .hf_utils import download_model
 from .engine_builder import build_trt_engine, TRTBuilderConfig, load_trt_build_config
 
@@ -105,8 +105,7 @@ class WhisperModelTRT(WhisperModel):
         
         
         # Load tokenizer
-        tokenizer_file_path = os.path.join(self.model_path, "tokenizer.json")
-        tokenizer = get_tokenizer()
+        tokenizer = Tokenizer()
 
         # Load model
         self.model = WhisperTRT(self.model_path, tokenizer)
@@ -239,17 +238,3 @@ class WhisperModelTRT(WhisperModel):
         texts = self.tokenizer.decode_batch([x[0] for x in result])
 
         return texts
-        
-        response = []
-        for idx, r in enumerate(result):
-            response.append({'text': texts[idx].strip()})
-
-        if self.asr_options['word_timestamps']:
-            text_tokens = [[_t for _t in x[0] if _t < self.tokenizer.eot]+[self.tokenizer.eot] for x in result]
-            sot_seqs = [tuple(_[-4:]) for _ in prompts]
-            word_timings = self.align_words(features, texts, text_tokens, sot_seqs, seq_lens, seg_metadata)
-
-            for _response, _word_timings in zip(response, word_timings):
-                _response['word_timestamps'] = _word_timings
-
-        return response

@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 
 from tqdm import tqdm
 
-from .... import CACHE_DIR
+from .... import CACHE_DIR, ASSETS_PATH
 
 SAVE_DIR = f"{CACHE_DIR}/models/trt"
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -30,7 +30,7 @@ def download_model(name):
     os.makedirs(download_path, exist_ok=True)
     
     model_ckpt_path = os.path.join(download_path, "pt_ckpt.pt")
-    tokenizer_path = os.path.join(download_path, "tokenizer.json")
+    tokenizer_path = os.path.join(ASSETS_PATH, "tokenizer.json")
     
     if not os.path.exists(tokenizer_path):
         with urllib.request.urlopen(_TOKENIZER[name]) as source, open(tokenizer_path, "wb") as output:
