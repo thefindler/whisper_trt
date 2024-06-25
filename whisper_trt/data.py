@@ -154,11 +154,11 @@ class WhisperDataLoader:
 
         return segmented_audio_signal
     
-    def get_data_loader_with_vad(self, audio_files, lang_codes, tasks, initial_prompts, batch_size=16):
+    def get_data_loader_with_vad(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16):
 
         segmented_audio_signal = []
         pbar_update_len = {}
-        for file_id, (audio_signal, lang, task, initial_prompt) in enumerate(zip(audio_batch_generator(audio_files), lang_codes, tasks, initial_prompts)):
+        for file_id, (audio_signal, lang, task, initial_prompt) in enumerate(zip(audio_batch_generator(audio_data), lang_codes, tasks, initial_prompts)):
             start_ends, audio_signal = self.speech_segmenter(audio_signal=audio_signal)
             new_segmented_audio_signal = self.get_segmented_audio_signal(start_ends, audio_signal, file_id, lang, task, initial_prompt)
             pbar_update_len[file_id] = 1/len(new_segmented_audio_signal)
@@ -179,11 +179,11 @@ class WhisperDataLoader:
 
         yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update
     
-    def get_data_loader(self, audio_files, lang_codes, tasks, initial_prompts, batch_size=16):
+    def get_data_loader(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16):
 
         segmented_audio_signal = []
         pbar_update_len = {}
-        for file_id, (audio_signal, lang, task, initial_prompt) in enumerate(zip(audio_batch_generator(audio_files), lang_codes, tasks, initial_prompts)):
+        for file_id, (audio_signal, lang, task, initial_prompt) in enumerate(zip(audio_batch_generator(audio_data), lang_codes, tasks, initial_prompts)):
             start_ends, audio_signal = self.basic_segmenter(audio_signal=audio_signal)
             new_segmented_audio_signal = self.get_segmented_audio_signal(start_ends, audio_signal, file_id, lang, task, initial_prompt)
             pbar_update_len[file_id] = 1/len(new_segmented_audio_signal)
@@ -204,8 +204,8 @@ class WhisperDataLoader:
 
         yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update
     
-    def __call__(self, audio_files, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True):
+    def __call__(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True):
         if use_vad:
-            return self.get_data_loader_with_vad(audio_files, lang_codes, tasks, initial_prompts, batch_size=batch_size)
+            return self.get_data_loader_with_vad(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size)
         else:
-            return self.get_data_loader(audio_files, lang_codes, tasks, initial_prompts, batch_size=batch_size)
+            return self.get_data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size)

@@ -304,26 +304,20 @@ class TextDecoder(nn.Module):
             the encoded audio features to be attended on
         """
         self.device = xa.device
-        print(x.device, xa.device, 1)
         offset = next(iter(kv_cache.values())).shape[1] if kv_cache else 0
         x = (
             self.token_embedding(x)
             + self.positional_embedding[offset : offset + x.shape[-1]]
         )
-        print(x.device, xa.device, 2)
         x = x.to(xa.dtype)
-        print(x.device, xa.device, 2)
 
         for block in self.blocks:
             x = block(x, xa, mask=self.mask, kv_cache=kv_cache)
 
-        print(x.device, xa.device, 3)
         x = self.ln(x)
-        print(x.device, xa.device, 4)
         logits = (
             x @ torch.transpose(self.token_embedding.weight.to(x.dtype), 0, 1)
         ).float()
-        print(x.device, xa.device, 5)
 
         return logits
 
@@ -402,7 +396,9 @@ class WhisperTRT:
     def generate(self, features, prompts, **generate_kwargs):
         if features.shape[1] == self.n_mels:
             features = self.encode(features)
-        print(self.detect_language(features))
+        
+        # todo: not giving correct results
+        # lang, lang_prob = self.detect_language(features)
         decoder_input_ids = torch.tensor(prompts)
             
         sampling_config = SamplingConfig(**generate_kwargs)

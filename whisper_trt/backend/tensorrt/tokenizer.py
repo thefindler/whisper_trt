@@ -151,7 +151,6 @@ class Tokenizer:
             self.special_tokens[special] = special_token
 
     def sot_sequence(self, task=None, lang=None):
-        print(lang, task, "ff")
         sequence = [self.special_tokens["<|startoftranscript|>"]]
 
         sequence.append(self.to_language_token(lang))

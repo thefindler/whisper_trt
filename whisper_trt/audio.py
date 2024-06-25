@@ -38,13 +38,13 @@ with tempfile.TemporaryDirectory() as tmpdir:
             print(f"Using 'swr' resampler. This may degrade performance.")
         
 
-def load_audio(audio_data, sr=16000, return_duration=False):
+def load_audio(audio_datum, sr=16000, return_duration=False):
     
-    if isinstance(audio_data, bytes):
-        x = audio_data
+    if isinstance(audio_datum, bytes):
+        x = audio_datum
     else:
         try:
-            with wave.open(audio_data, 'rb') as wf:
+            with wave.open(audio_datum, 'rb') as wf:
                 if (wf.getframerate() != sr) or (wf.getnchannels() != 1):
                     raise Exception("Not a 16kHz wav mono channel file!")
                     
@@ -53,7 +53,7 @@ def load_audio(audio_data, sr=16000, return_duration=False):
         except:
             with tempfile.TemporaryDirectory() as tmpdir:
                 wav_file = f"{tmpdir}/tmp.wav"
-                ret_code = os.system(f'ffmpeg -hide_banner -loglevel panic -i "{audio_data}" -threads 1 -acodec pcm_s16le -ac 1 -af aresample=resampler={RESAMPLING_ENGINE} -ar {sr} "{wav_file}" -y')
+                ret_code = os.system(f'ffmpeg -hide_banner -loglevel panic -i "{audio_datum}" -threads 1 -acodec pcm_s16le -ac 1 -af aresample=resampler={RESAMPLING_ENGINE} -ar {sr} "{wav_file}" -y')
                 if ret_code != 0: raise RuntimeError("ffmpeg failed to resample the input audio file, make sure ffmpeg is compiled properly!")
             
                 with wave.open(wav_file, 'rb') as wf:
@@ -70,8 +70,8 @@ def load_audio(audio_data, sr=16000, return_duration=False):
 
 
 THREAD_POOL_AUDIO_LOADER = Pool(2)
-def audio_batch_generator(audio_files):
-    return THREAD_POOL_AUDIO_LOADER.imap(load_audio, audio_files)
+def audio_batch_generator(audio_data):
+    return THREAD_POOL_AUDIO_LOADER.imap(load_audio, audio_data)
 
 
 def pad_or_trim(array, length: int = N_SAMPLES, *, axis: int = -1):
