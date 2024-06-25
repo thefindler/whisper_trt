@@ -61,9 +61,9 @@ def load_audio(audio_datum, sr=16000, return_duration=False):
                     x = wf.readframes(int(frames))
     
     audio_signal = np.frombuffer(x, np.int16).flatten().astype(np.float32)/32768.0
-    audio_duration = len(audio_signal)/sr
     
     if return_duration:
+        audio_duration = len(audio_signal)/sr
         return audio_signal, audio_duration
     else:
         return audio_signal

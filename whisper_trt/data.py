@@ -154,6 +154,7 @@ class WhisperDataLoader:
 
         return segmented_audio_signal
     
+    # todo: make a new function in case segments are not needed
     def get_data_loader_with_vad(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16):
 
         segmented_audio_signal = []

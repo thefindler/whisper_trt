@@ -108,7 +108,7 @@ class WhisperModel(ABC):
 
     
     @abstractmethod
-    def generate_segment_batched(self, features, prompts):
+    def generate_text(self, features, prompts):
         pass
 
     @torch.no_grad()
@@ -122,7 +122,7 @@ class WhisperModel(ABC):
         
         for signals, prompts, seq_len, seg_metadata, pbar_update in self.data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, use_vad=True):
             mels, seq_len = self.preprocessor(signals, seq_len)
-            res = self.generate_segment_batched(mels.to(self.device), prompts, seq_len, seg_metadata)
+            res = self.generate_text(mels.to(self.device), prompts, seq_len, seg_metadata)
             responses.append(res)
 
             # for res_idx, _seg_metadata in enumerate(seg_metadata):

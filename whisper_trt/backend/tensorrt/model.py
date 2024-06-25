@@ -229,7 +229,7 @@ class WhisperModelTRT(WhisperModel):
 
         return word_timings
     
-    def generate_segment_batched(self, features, prompts, seq_lens, seg_metadata):
+    def generate_text(self, features, prompts, seq_lens, seg_metadata):
 
         result = self.model.generate(features,
                                      prompts,
