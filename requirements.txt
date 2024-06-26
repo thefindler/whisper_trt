@@ -1,6 +1,6 @@
 tqdm
 rich
-torch
+torch==2.1.2
 numpy
 platformdirs
 ctranslate2

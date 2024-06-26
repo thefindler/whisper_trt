@@ -5,7 +5,7 @@ with open("requirements.txt", "r", encoding="utf-8") as f:
 
 setup(
     name="whisper_trt",
-    version="0.1",
+    version="1.0",
     description="TRT implementation of Whisper Model.",
     long_description="An Optimized Speech-to-Text Pipeline for the Whisper Model.",
     long_description_content_type="text/markdown",
