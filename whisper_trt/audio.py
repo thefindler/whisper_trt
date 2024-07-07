@@ -39,7 +39,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
         
 
 def load_audio(audio_datum, sr=16000, return_duration=False):
-    
     if isinstance(audio_datum, bytes):
         x = audio_datum
     else:

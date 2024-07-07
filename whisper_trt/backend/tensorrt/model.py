@@ -71,7 +71,7 @@ class WhisperModelTRT(WhisperModel):
                  **model_kwargs):
 
         # ASR Options
-        self.asr_options = FAST_ASR_OPTIONS
+        self.asr_options = BEST_ASR_CONFIG
         self.asr_options.update(asr_options)
         
         # Get local model path or build a new engine

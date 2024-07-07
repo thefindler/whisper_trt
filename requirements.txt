@@ -9,6 +9,6 @@ huggingface-hub
 accelerate
 optimum
 tiktoken
-transformers
-openai-whisper
 nvidia-ml-py
+matplotlib
+pandas

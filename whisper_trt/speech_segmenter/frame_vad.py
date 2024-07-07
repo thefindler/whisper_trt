@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy as np
+from ..utils import make_vad_plot
 
 from . import VADBaseClass
 from .. import BASE_PATH
@@ -98,11 +99,12 @@ class FrameVAD(VADBaseClass):
         
         return all_logits[:, 1].detach().cpu().numpy()
     
-    def __call__(self, audio_signal):
+    def __call__(self, audio_signal, plot=False):
         audio_duration = len(audio_signal)/self.sampling_rate
         
         input_signal, input_signal_length = self.prepare_input_batch(audio_signal)
         speech_probs = self.forward(input_signal, input_signal_length)
+        make_vad_plot(speech_probs)
 
         vad_times = []
         for idx, prob in enumerate(speech_probs):

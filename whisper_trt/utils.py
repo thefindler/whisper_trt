@@ -2,7 +2,23 @@ import os
 import json
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TimeElapsedColumn
+import matplotlib.pyplot as plt
+import pandas as pd
 
+
+def make_vad_plot(vad_values):
+  new_data = pd.DataFrame(vad_values)
+
+  # Plotting the line chart with index as x-axis
+  plt.figure(figsize=(20, 6))
+  plt.plot(new_data.index, new_data[0], marker='o', linestyle='dotted', label='Values')
+
+  plt.xlabel('Index')
+  plt.ylabel('Values')
+  plt.title('Line Chart of Given Data')
+  plt.legend()
+  plt.grid(True)
+  plt.show()
 
 class RunningStatus:
     def __init__(self, status_text, console=None):

@@ -84,7 +84,7 @@ def load_trt_build_config(output_dir):
     return trt_build_args
 
 
-def build_trt_engine(model_name='large-v2', args=None, force=False, log_level='error'):
+def build_trt_engine(model_name='large-v3', args=None, force=False, log_level='error'):
     
     if args is None:
         console.print(f"args is None, using default configs.")
