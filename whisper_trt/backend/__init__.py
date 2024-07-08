@@ -99,7 +99,7 @@ class WhisperModel(ABC):
             max_speech_len=self.max_speech_len, 
             max_initial_prompt_len=self.max_initial_prompt_len, 
             use_dynamic_time_axis=self.use_dynamic_time_axis,
-            merge_chunks=self.merge_chunks
+            merge_chunks=self.merge_chunks,
             make_plot=self.make_plot
         )
 
