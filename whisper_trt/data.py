@@ -77,7 +77,8 @@ class WhisperDataLoader:
                  max_speech_len=29.0, 
                  max_initial_prompt_len=223,
                  merge_chunks=True,
-                 use_dynamic_time_axis=False):
+                 use_dynamic_time_axis=False,
+                 make_plot=False):
         
         self.device = device
         self.tokenizer = tokenizer
@@ -89,6 +90,7 @@ class WhisperDataLoader:
         self.max_initial_prompt_len = max_initial_prompt_len
         self.use_dynamic_time_axis = use_dynamic_time_axis
         self.merge_chunks = merge_chunks
+        self.make_plot = make_plot
         
     def data_collate_fn(self, batch):
         if self.use_dynamic_time_axis:
@@ -205,8 +207,8 @@ class WhisperDataLoader:
 
         yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update, 0.5
     
-    def __call__(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True, make_plot=False):
+    def __call__(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True):
         if use_vad:
-            return self.get_data_loader_with_vad(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=make_plot)
+            return self.get_data_loader_with_vad(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=self.make_plot)
         else:
-            return self.get_data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=make_plot)
+            return self.get_data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=self.make_plot)

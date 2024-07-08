@@ -96,7 +96,7 @@ class WhisperModel(ABC):
             self.device, self.tokenizer, self.speech_segmenter, 
             dta_padding=self.dta_padding,
             without_timestamps=self.without_timestamps, 
-            max_speech_len=self.max_speech_len, 
+            max_speech_len=self.max_speech_len,
             max_initial_prompt_len=self.max_initial_prompt_len, 
             use_dynamic_time_axis=self.use_dynamic_time_axis,
             merge_chunks=self.merge_chunks,
