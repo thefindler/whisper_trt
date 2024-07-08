@@ -38,6 +38,7 @@ class WhisperModel(ABC):
     def __init__(self,
                  tokenizer=None,
                  vad_model=None,
+                 make_plot = False,
                  n_mels=80,
                  device="cuda",
                  device_index=0,
@@ -66,6 +67,7 @@ class WhisperModel(ABC):
         self.max_text_token_len = max_text_token_len
 
         self.vad_model = vad_model
+        self.make_plot = make_plot
         self.speech_segmenter_options = speech_segmenter_options
         self.speech_segmenter_options['max_seg_len'] = self.max_speech_len
 
@@ -98,6 +100,7 @@ class WhisperModel(ABC):
             max_initial_prompt_len=self.max_initial_prompt_len, 
             use_dynamic_time_axis=self.use_dynamic_time_axis,
             merge_chunks=self.merge_chunks
+            make_plot=self.make_plot
         )
 
     def update_params(self, params={}):
@@ -120,11 +123,10 @@ class WhisperModel(ABC):
             
         responses = []
         
-        for signals, prompts, seq_len, seg_metadata, pbar_update in self.data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, use_vad=True):
+        for signals, prompts, seq_len, seg_metadata, pbar_update, avg_speech_prob in self.data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, use_vad=True):
             mels, seq_len = self.preprocessor(signals, seq_len)
             res = self.generate_text(mels.to(self.device), prompts, seq_len, seg_metadata)
-            responses.append(res)
-
+            responses.append({ "text": res, "avg_speech_prob": avg_speech_prob })
             # for res_idx, _seg_metadata in enumerate(seg_metadata):
             #     responses[_seg_metadata['file_id']].append({**res[res_idx],
             #                                                 'start_time': round(_seg_metadata['start_time'], 3),

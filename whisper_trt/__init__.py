@@ -9,7 +9,7 @@ CACHE_DIR = os.path.join(BASE_PATH, "model")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 
-def load_model(model_identifier="large-v3",
+def load_model(model_identifier="large-v3", make_plot=False,
                **model_kwargs):
     
     if model_identifier in ['large-v3']:
@@ -17,5 +17,5 @@ def load_model(model_identifier="large-v3",
     
     from .backend.tensorrt.model import WhisperModelTRT as WhisperModel
         
-    return WhisperModel(model_identifier, **model_kwargs)
+    return WhisperModel(model_identifier, make_plot=make_plot, **model_kwargs)
         

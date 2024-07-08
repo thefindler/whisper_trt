@@ -99,12 +99,14 @@ class FrameVAD(VADBaseClass):
         
         return all_logits[:, 1].detach().cpu().numpy()
     
-    def __call__(self, audio_signal, plot=False):
+    def __call__(self, audio_signal, make_plot=False):
         audio_duration = len(audio_signal)/self.sampling_rate
         
         input_signal, input_signal_length = self.prepare_input_batch(audio_signal)
         speech_probs = self.forward(input_signal, input_signal_length)
-        make_vad_plot(speech_probs)
+        avg_speech_prob = sum(speech_probs)/len(speech_probs)
+        if make_plot:
+            make_vad_plot(speech_probs)
 
         vad_times = []
         for idx, prob in enumerate(speech_probs):
@@ -115,4 +117,4 @@ class FrameVAD(VADBaseClass):
                 
             vad_times.append([prob, s_time, e_time])
 
-        return np.array(vad_times)
+        return np.array(vad_times), avg_speech_prob

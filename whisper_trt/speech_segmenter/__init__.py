@@ -115,13 +115,13 @@ class SpeechSegmenter:
         return start_ends
              
     
-    def __call__(self, audio_data=None, audio_signal=None):
+    def __call__(self, audio_data=None, audio_signal=None, make_plot=False):
         if audio_signal is None:
             audio_signal, audio_duration = load_audio(audio_data, sr=self.sampling_rate, return_duration=True)
         else:
             audio_duration = len(audio_signal)/self.sampling_rate
             
-        speech_probs = self.vad_model(audio_signal)
+        speech_probs, avg_speech_prob = self.vad_model(audio_signal, make_plot)
         start_ends = self.get_speech_segments(speech_probs)
         
         if len(start_ends) == 0:
@@ -130,4 +130,4 @@ class SpeechSegmenter:
         start_ends[0][0] = max(0.0, start_ends[0][0]) # fix edges
         start_ends[-1][1] = min(audio_duration, start_ends[-1][1]) # fix edges
         
-        return start_ends, audio_signal
+        return start_ends, audio_signal, avg_speech_prob

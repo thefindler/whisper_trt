@@ -155,12 +155,12 @@ class WhisperDataLoader:
         return segmented_audio_signal
     
     # todo: make a new function in case segments are not needed
-    def get_data_loader_with_vad(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16):
+    def get_data_loader_with_vad(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, make_plot=False):
 
         segmented_audio_signal = []
         pbar_update_len = {}
         for file_id, (audio_signal, lang, task, initial_prompt) in enumerate(zip(audio_batch_generator(audio_data), lang_codes, tasks, initial_prompts)):
-            start_ends, audio_signal = self.speech_segmenter(audio_signal=audio_signal)
+            start_ends, audio_signal, avg_speech_prob = self.speech_segmenter(audio_signal=audio_signal, make_plot=make_plot)
             new_segmented_audio_signal = self.get_segmented_audio_signal(start_ends, audio_signal, file_id, lang, task, initial_prompt)
             pbar_update_len[file_id] = 1/len(new_segmented_audio_signal)
             
@@ -173,12 +173,12 @@ class WhisperDataLoader:
                 signal_batch, prompt_batch, seq_len, seg_metadata = self.data_collate_fn(batch)
                 pbar_update = int(sum([pbar_update_len[_['file_id']] for _ in seg_metadata])*100)
                 
-                yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update
+                yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update, avg_speech_prob
         
         signal_batch, prompt_batch, seq_len, seg_metadata = self.data_collate_fn(segmented_audio_signal)
         pbar_update = int(sum([pbar_update_len[_['file_id']] for _ in seg_metadata])*100)
 
-        yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update
+        yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update, avg_speech_prob
     
     def get_data_loader(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16):
 
@@ -189,7 +189,7 @@ class WhisperDataLoader:
             new_segmented_audio_signal = self.get_segmented_audio_signal(start_ends, audio_signal, file_id, lang, task, initial_prompt)
             pbar_update_len[file_id] = 1/len(new_segmented_audio_signal)
             
-            segmented_audio_signal = segmented_audio_signal + new_segmented_audio_signal
+            segmented_audio_signal = segmented_audio_signal + new_segmented_audio_signal, 0.5
 
             while len(segmented_audio_signal) > batch_size:
                 batch = segmented_audio_signal[:batch_size]
@@ -203,10 +203,10 @@ class WhisperDataLoader:
         signal_batch, prompt_batch, seq_len, seg_metadata = self.data_collate_fn(segmented_audio_signal)
         pbar_update = int(sum([pbar_update_len[_['file_id']] for _ in seg_metadata])*100)
 
-        yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update
+        yield signal_batch, prompt_batch, seq_len, seg_metadata, pbar_update, 0.5
     
-    def __call__(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True):
+    def __call__(self, audio_data, lang_codes, tasks, initial_prompts, batch_size=16, use_vad=True, make_plot=False):
         if use_vad:
-            return self.get_data_loader_with_vad(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size)
+            return self.get_data_loader_with_vad(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=make_plot)
         else:
-            return self.get_data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size)
+            return self.get_data_loader(audio_data, lang_codes, tasks, initial_prompts, batch_size=batch_size, make_plot=make_plot)
