@@ -28,7 +28,7 @@ FAST_ASR_OPTIONS = {
     "without_timestamps": True,
     "max_initial_timestamp": 1.0,
     "word_timestamps": False, # Placeholder
-    "sampling_temperature": 1.0,
+    "sampling_temperature":0.2,
     "return_scores": True,
     "return_no_speech_prob": True,
     "word_aligner_model": 'tiny',
@@ -44,14 +44,14 @@ BEST_ASR_CONFIG = {
     "no_repeat_ngram_size": 0,
     "compression_ratio_threshold": 2.4, # Placeholder
     "log_prob_threshold": -1.0, # Placeholder
-    "no_speech_threshold": 0.5, # Placeholder
+    "no_speech_threshold": 0.6, # Placeholder
     "prefix": None, # Placeholder
     "suppress_blank": True,
     "suppress_tokens": [-1],
     "without_timestamps": True,
     "max_initial_timestamp": 1.0,
     "word_timestamps": False, # Placeholder
-    "sampling_temperature": 1.0,
+    "sampling_temperature": 0.2,
     "return_scores": True,
     "return_no_speech_prob": True,
     "word_aligner_model": 'tiny',
