@@ -24,5 +24,5 @@ echo 'export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:'${CUDNN_PATH} >> ~/.bashrc
 
 echo ""
 echo "###########################[ Installing TensorRT-LLM ]###########################"
-pip3 install --no-cache-dir tensorrt_llm==0.8.0.dev2024012301 --extra-index-url https://pypi.nvidia.com
-pip3 install --no-cache-dir -U torch==2.1.2
+pip3 install --no-cache-dir tensorrt_llm==0.18.1 --extra-index-url https://pypi.nvidia.com
+pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
