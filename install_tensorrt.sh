@@ -1,6 +1,9 @@
 echo ""
 echo "###########################[ Installing Build Tools ]##########################"
 apt-get update && apt-get install -y build-essential ca-certificates ccache cmake gnupg2 wget curl gdb || sudo apt-get update && sudo apt-get install -y build-essential ca-certificates ccache cmake gnupg2 wget curl gdb
+apt-get update && apt-get install -y libsndfile1 ffmpeg
+apt-get install python3-dev
+
 
 echo ""
 echo "###########################[ Installing OpenMPI ]###########################"
