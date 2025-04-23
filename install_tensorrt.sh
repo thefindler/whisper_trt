@@ -1,8 +1,11 @@
+pip install -r requirements.txt
+
 echo ""
 echo "###########################[ Installing Build Tools ]##########################"
 apt-get update && apt-get install -y build-essential ca-certificates ccache cmake gnupg2 wget curl gdb || sudo apt-get update && sudo apt-get install -y build-essential ca-certificates ccache cmake gnupg2 wget curl gdb
 apt-get update && apt-get install -y libsndfile1 ffmpeg
-apt-get install python3-dev
+apt-get install -y python3-dev
+apt install -y pkg-config libcairo2-dev
 
 
 echo ""
@@ -26,3 +29,4 @@ echo ""
 echo "###########################[ Installing TensorRT-LLM ]###########################"
 pip3 install --no-cache-dir -U torch==2.1.2
 pip3 install --no-cache-dir tensorrt_llm==0.8.0.dev2024012301 --extra-index-url https://pypi.nvidia.com
+pip install pynvml==11.0.0
